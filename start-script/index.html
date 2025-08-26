@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Sunucu Kod Üretici</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://berlinxr.cfd/style.css">
+    <style>
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        section#generator {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    .generator {
+        margin: auto;  
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); 
+        padding: 20px;
+        border: 2px solid #ccc;
+        border-radius: 12px;
+        max-width: 600px;
+    }
+        label, select, input {
+            display: block;
+            margin: 10px 0;
+            width: 100%;
+        }
+        #output {
+            background: #111;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #007bff;
+            color: #fff;
+            font-weight: bold;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo"><img src="https://berlinxr.cfd/logo.gif" alt="logogif" style="width:48px;height:48px; border-radius: 50%;"></div>
+            <ul class="nav-links">
+                <li><a href="index.html#anasayfa">Anasayfa</a></li>
+            </ul>
+        </nav>
+    </header>
+
+<section id="generator" class="section">
+    <div class="generator">
+        <h2>Minecraft Server Start Script Generator</h2>
+
+        <label for="ram">RAM Seç:</label>
+        <select id="ram">
+            <option value="1024">1 GB</option>
+            <option value="2048">2 GB</option>
+            <option value="4096">4 GB</option>
+            <option value="8192">8 GB</option>
+            <option value="custom">Custom</option>
+        </select>
+
+        <div id="customRamDiv" style="display:none;">
+            <label for="customRamInput">Custom RAM (MB cinsinden):</label>
+            <input type="number" id="customRamInput" placeholder="Örn: 6144">
+        </div>
+
+        <label for="gui">Sunucu Modu:</label>
+        <select id="gui">
+            <option value="">GUI (Pencereli)</option>
+            <option value=" nogui">NoGUI (Konsol)</option>
+        </select>
+
+        <label for="filename">Jar Dosya Adı:</label>
+        <input type="text" id="filename" value="server.jar">
+
+        <button onclick="generateCode()">Kodu Üret</button>
+
+        <h3>Çıktı:</h3>
+        <div id="output">Burada kod gözükecek...</div>
+    </div>
+</section>
+    
+<footer>
+<p>🌍 Open Source on <a href="">GitHub</a></p>
+</footer>
+
+<script>
+function generateCode() {
+    let ram = document.getElementById("ram").value;
+    if (ram === "custom") {
+        ram = document.getElementById("customRamInput").value;
+    }
+    let gui = document.getElementById("gui").value;
+    let filename = document.getElementById("filename").value.trim();
+
+    if (!ram || !filename) {
+        document.getElementById("output").innerText = "Lütfen RAM ve jar dosya adını girin.";
+        return;
+    }
+
+    let code = `java -Xmx${ram}M -Xms${ram}M -jar ${filename}${gui}`;
+    document.getElementById("output").innerText = code;
+}
+document.getElementById("ram").addEventListener("change", function() {
+    if (this.value === "custom") {
+        document.getElementById("customRamDiv").style.display = "block";
+    } else {
+        document.getElementById("customRamDiv").style.display = "none";
+    }
+});
+</script>
+</body>
+</html>
