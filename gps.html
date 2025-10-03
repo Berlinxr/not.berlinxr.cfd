@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>EXIF GPS + Kamera Bilgisi + Leaflet Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #container {
+            display: flex;
+            gap: 20px;
+        }
+        #info {
+            width: 250px;
+        }
+        #map {
+            width: 600px;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fotoğraf EXIF GPS & Kamera Bilgisi</h1>
+    <input type="file" id="fileInput" accept="image/*">
+    <div id="container">
+        <div id="info">
+            <p id="output">GPS ve kamera bilgisi burada görünecek.</p>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <!-- EXIF JS -->
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        const input = document.getElementById('fileInput');
+        const output = document.getElementById('output');
+
+        // Leaflet haritasını başlat (dünya merkezi)
+        const map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        let marker = null;
+
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            EXIF.getData(file, function() {
+                // GPS bilgisi
+                const lat = EXIF.getTag(this, "GPSLatitude");
+                const lon = EXIF.getTag(this, "GPSLongitude");
+                const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
+                const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
+
+                // Kamera bilgisi
+                const make = EXIF.getTag(this, "Make") || "Bilinmiyor";
+                const model = EXIF.getTag(this, "Model") || "";
+
+                if (lat && lon) {
+                    const latitude = (lat[0] + lat[1]/60 + lat[2]/3600) * (latRef === "N" ? 1 : -1);
+                    const longitude = (lon[0] + lon[1]/60 + lon[2]/3600) * (lonRef === "E" ? 1 : -1);
+                    output.innerHTML = `Latitude: ${latitude}<br>Longitude: ${longitude}<br>Cihaz: ${make} ${model}`;
+
+                    // Marker ekle veya güncelle
+                    if (marker) {
+                        marker.setLatLng([latitude, longitude]);
+                    } else {
+                        marker = L.marker([latitude, longitude]).addTo(map);
+                    }
+                    map.setView([latitude, longitude], 13);
+                } else {
+                    output.innerHTML = `GPS bilgisi yok.<br>Cihaz: ${make} ${model}`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
